@@ -1,0 +1,55 @@
+{% extends "base_menu.html" %}
+{% block content %}
+{% load humanize %} <!-- https://docs.djangoproject.com/en/3.0/ref/contrib/humanize -->
+<h1>Ads</h1>
+<p>
+    {% if ad_list %}
+    <select class="form-select" id="id_ad" data-ad-url="{% url 'ads:ajax_load_ads' %}">
+        <option selected>AAAAAAAAAAAA</option>
+        {% for ad in ad_list %}
+        <option value="{{ad.id}}">
+            {{ ad.title }} -- ${{ad.price}}
+            <!--            {% if ad.owner == user %}-->
+            <!--            (<a href="{% url 'ads:ad_update' ad.id %}">Edit</a> |-->
+            <!--            <a href="{% url 'ads:ad_delete' ad.id %}">Delete</a>)-->
+            <!--            {% endif %}-->
+        </option>
+        {% endfor %}
+    </select>
+<div id="id_ads">
+
+
+</div>
+{% else %}
+<p>There are no ads in the database.</p>
+{% endif %}
+</p>
+
+<script>
+    $("#id_ad").change(function () {
+        const url = $("#id_ad").attr("data-ad-url");  // get the url of the `load_cities` view
+        const adId = $(this).val();  // get the selected country ID from the HTML input
+
+        $.ajax({                       // initialize an AJAX request
+            url: url,                    // set the url of the request (= /persons/ajax/load-cities/ )
+            data: {
+                'ad_id': adId       // add the country id to the GET parameters
+            },
+            success: function (data) {   // `data` is the return of the `load_cities` view function
+                $("#id_ads").html(data);  // replace the contents of the city input with the data that came from the server
+                /*
+
+                let html_data = '<option value="">---------</option>';
+                data.forEach(function (city) {
+                    html_data += `<option value="${city.id}">${city.name}</option>`
+                });
+                console.log(html_data);
+                $("#id_city").html(html_data);
+
+                */
+            }
+        });
+
+    });
+</script>
+{% endblock %}
